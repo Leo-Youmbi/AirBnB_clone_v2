@@ -1,10 +1,27 @@
 #!/usr/bin/python3
 """ Script that distributes an archive to your web servers using do_deploy"""
-
-from fabric.api import env, local
-from fabric.operations import run, put, sudo
+from fabric.api import *
+import time
 import os.path
 env.hosts = ['54.210.90.11', '52.87.219.193']
+
+
+def do_pack():
+    """
+    Create a compressed tarball archive of the web_static/ directory.
+
+    Returns:
+        str: Path to the created tarball archive.
+            If an exception occurs during the process, returns None.
+    """
+    time_string = time.strftime("%Y%m%d%H%M%S")
+    try:
+        local("mkdir -p versions")
+        local("tar -cvzf versions/web_static_{}.tgz web_static/".
+              format(time_string))
+        return ("versions/web_static_{}.tgz".format(time_string))
+    except Exception as e:
+        return None
 
 
 def do_deploy(archive_path):
@@ -32,5 +49,15 @@ def do_deploy(archive_path):
         run("sudo rm -rf /data/web_static/current")
         run("sudo ln -s {} /data/web_static/current".format(ndir))
         return True
+    except Exception as e:
+        return False
+
+
+def deploy():
+    """Create and distribute an archive to a web server."""
+    try:
+        archive_address = do_pack()
+        val = do_deploy(archive_address)
+        return val
     except Exception as e:
         return False
