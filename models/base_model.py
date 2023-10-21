@@ -8,6 +8,7 @@ from models import storage_type
 
 Base = declarative_base()
 
+
 class BaseModel:
     """This class will defines all common attributes/methods
     for other classes
@@ -63,7 +64,7 @@ class BaseModel:
             if type(dct[k]) is datetime:
                 dct[k] = dct[k].isoformat()
         if '_sa_instance_state' in dct.keys():
-            del(dct['_sa_instance_state'])
+            del (dct['_sa_instance_state'])
         return dct
 
     def delete(self):
