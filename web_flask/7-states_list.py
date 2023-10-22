@@ -1,7 +1,8 @@
-#!/usr/bin/python3 
+#!/usr/bin/python3
 """Script that starts a Flask web application"""
 from flask import Flask, render_template
-import models
+from models import storage
+from models.state import State
 
 
 app = Flask(__name__)
@@ -12,15 +13,16 @@ def states_list():
     """Displays an HTML page with a list of all State objects in DBStorage.
     States are sorted by name.
     """
-    
-    states = models.storage.all("State")
+    states = storage.all(State).values()
+    # print(states)
+    # print()
     return render_template("7-states_list.html", states=states)
 
 
 @app.teardown_appcontext
 def teardown(exc):
     """Remove the current SQLAlchemy session."""
-    models.storage.close()
+    storage.close()
 
 
 if __name__ == "__main__":
